@@ -1,8 +1,8 @@
 class Schema:
     def __init__(self):
-        # self.version = None
+        self.version = None
         self.name = None
-        # self.description = None
+        self.description = None
         self.domains = list()
         self.tables = list()
 
@@ -11,10 +11,12 @@ class Table:
     def __init__(self):
         self.name = None
         self.description = None
-        self.temporal_mode = None
+        self.temporal_mode = False
         self.add = False
         self.edit = False
         self.delete = False
+        self.ht_table_flags = None
+        self.access_level = None
         self.means = None
         self.fields = list()
         self.constraints = list()

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dbd_schema version="v1.0" name="TEST" description="Описатедь БД">
+  <tables>
+    <table name="CONSTYPE" description="Виды ограничений" ht_table_flags="s">
+      <field name="VidOgranich" rname="ВидОгранич" domain="ВидОгранич" props="input, show_in_grid, show_in_details, required"/>
+      <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
+      <constraint kind="PRIMARY" items="VidOgranich"/>
+      <index field="Nazvanie" props="uniqueness"/>
+    </table>
+  </tables>
+</dbd_schema>
