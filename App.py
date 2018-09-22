@@ -10,3 +10,14 @@ print("version= ", schema.version)
 print("name= ", schema.name)
 print("description= ", schema.description)
 
+print("----------Tables----------")
+for table in schema.tables:
+    print("  *--", table.name, "--*")
+    print("    description= ", table.description)
+    for field in table.fields:
+        print("    %----", field.name, "----%")
+        print("      rname= ", field.rname)
+        print("      domain= ", field.domain)
+
+    print("  *---------------*")
+
