@@ -2,7 +2,7 @@ import os
 import xml.dom.minidom as dom
 from xml_to_ram import XMLtoRAM
 
-xml = dom.parse(os.path.join("xml/", "xml-test.xml"))
+xml = dom.parse(os.path.join("xml/", "xml_test.xml"))
 schema = XMLtoRAM(xml).xml_to_ram()
 
 print("----------Schema----------")
