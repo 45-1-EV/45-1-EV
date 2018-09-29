@@ -39,24 +39,6 @@ class Field:
         self.required = False
 
 
-class Domain:
-    def __init__(self):
-        self.name = None
-        self.description = None
-        self.type = None
-        self.align = None
-        self.width = None
-        self.show_null = False
-        self.summable = False
-        self.case_sensitive = False
-        self.show_lead_nulls = False
-        self.thousands_separator = False
-        self.char_length = None
-        self.length = None
-        self.precision = None
-        self.scale = None
-
-
 class Constraint:
     def __init__(self):
         self.name = None
@@ -76,4 +58,22 @@ class Index:
         self.fulltext = False
         self.uniqueness = False
         self.local = False
+
+
+class Domain:
+    def __init__(self):
+        self.name = None
+        self.description = None
+        self.type = None
+        self.align = None
+        self.width = None
+        self.show_null = False
+        self.summable = False
+        self.case_sensitive = False
+        self.show_lead_nulls = False
+        self.thousands_separator = False
+        self.char_length = None
+        self.length = None
+        self.precision = None
+        self.scale = None
 

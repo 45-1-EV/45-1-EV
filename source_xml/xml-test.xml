@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dbd_schema version="v1.0" name="TEST" description="Описатедь БД">
+  <domains>
+    <domain name="BinData" type="BLOB" align="L"/>
+    <domain name="CODE" type="STRING" align="L" width="15" char_length="15"/>
+    <domain name="ID пункта" description="Идентификатор пункта содерж." type="LARGEINT" align="L" width="8"/>
+    <domain name="ID статьи" type="LARGEINT" align="L" width="11"/>
+    <domain name="IDC" type="WORD" align="L" width="5"/>
+    <domain name="ID_descr" type="LARGEINT" align="L" width="11"/>
+  </domains>
   <tables>
     <table name="CONSTYPE" description="Виды ограничений" ht_table_flags="s">
       <field name="VidOgranich" rname="ВидОгранич" domain="ВидОгранич" props="input, show_in_grid, show_in_details, required"/>
       <field name="Nazvanie" rname="Название" domain="Название" props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
       <constraint kind="PRIMARY" items="VidOgranich"/>
       <index field="Nazvanie" props="uniqueness"/>
+    </table>
+    <table name="CHAP_REF" description="Справочник разделов" ht_table_flags="rs" access_level="0">
+      <field name="Razdel" rname="Раздел" domain="Раздел" props="show_in_grid, show_in_details"/>
+      <field name="Naimenovan" rname="Наименован" domain="Наименован" props="show_in_grid, show_in_details, is_mean"/>
+      <constraint kind="PRIMARY" items="Razdel"/>
+    </table>
+    <table name="CLIENT" description="Клиенты" props="add, edit" ht_table_flags="rws" access_level="0">
+      <field name="KodKlienta" rname="КодКлиента" domain="КодКлиента" props="show_in_details, autocalculated"/>
+      <field name="Organizacz_" rname="Организац." domain="Организац." props="input, edit, show_in_grid, show_in_details, is_mean, required"/>
+      <field name="KodVedomst" rname="КодВедомст" domain="КодВедомст" description="Ведомство" props="input, edit, show_in_details, required"/>
+      <field name="Podrazd_" rname="Подразд." domain="Подразд." props="show_in_details"/>
+      <field name="Fond" rname="Фонд" domain="Фонд" props="show_in_details"/>
+      <constraint kind="PRIMARY" items="KodKlienta"/>
+      <constraint kind="FOREIGN" items="KodVedomst" reference="S_VEDOMS" props="has_value_edit"/>
+      <index field="Fond"/>
+      <index field="KodVedomst"/>
+      <index field="Organizacz_" props="uniqueness"/>
+      <index field="Podrazd_"/>
     </table>
   </tables>
 </dbd_schema>

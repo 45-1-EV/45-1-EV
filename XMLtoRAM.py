@@ -9,6 +9,95 @@ class XMLtoRAM:
     def xml_to_ram(self):
         return self.get_schema()
 
+    def get_domains(self):
+        domain_list = list()
+        for domain in self.xml_repr.getElementsByTagName("domain"):
+            dom = Classes.Domain()
+            for an, av in domain.attributes.items():
+                if an.lower() == "name":
+                    dom.name = av
+                elif an.lower() == "description":
+                    dom.description = av
+                elif an.lower() == "type":
+                    dom.type = av
+                elif an.lower() == "align":
+                    dom.align = av
+                elif an.lower() == "width":
+                    dom.width = av
+                elif an.lower() == "props":
+                    for prop in av.split(", "):
+                        if prop == "show_null":
+                            dom.show_null = True
+                        elif prop == "summable":
+                            dom.summable = True
+                        elif prop == "case_sensitive":
+                            dom.case_sensitive = True
+                        elif prop == "show_lead_nulls":
+                            dom.show_lead_nulls = True
+                        elif prop == "thousand_separator":
+                            dom.thousands_separator = True
+                elif an.lower() == "char_length":
+                    dom.char_length = av
+                elif an.lower() == "length":
+                    dom.length = av
+                elif an.lower() == "precision":
+                    dom.precision = av
+                elif an.lower() == "scale":
+                    dom.scale = av
+            domain_list.append(dom)
+
+        return domain_list
+
+    @staticmethod
+    def get_indices(table):
+        indices_list = list()
+        for index in table.getElementsByTagName("index"):
+            idx = Classes.Index()
+            for an, av in index.attributes.items():
+                if an.lower() == "name":
+                    idx.name = av
+                elif an.lower() == "field":
+                    idx.field = av
+                elif an.lower() == "props":
+                    for prop in av.split(", "):
+                        if prop == "fulltext":
+                            idx.fulltext = True
+                        elif prop == "uniqueness":
+                            idx.uniqueness = True
+                        elif prop == "local":
+                            idx.local = True
+            indices_list.append(idx)
+
+        return indices_list
+
+    @staticmethod
+    def get_constraints(table):
+        constraints_list = list()
+        for constraint in table.getElementsByTagName("constraint"):
+            const = Classes.Constraint()
+            for an, av in constraint.attributes.items():
+                if an.lower() == "name":
+                    const.name = av
+                elif an.lower() == "kind":
+                    const.kind = av
+                elif an.lower() == "items":
+                    const.items = av
+                elif an.lower() == "unique_key_id":
+                    const.unique_key_id = av
+                elif an.lower() == "reference":
+                    const.reference = av
+                elif an.lower() == "expression":
+                    const.expression = av
+                elif an.lower() == "props":
+                    for prop in av.split(", "):
+                        if prop == "has_value_edit":
+                            const.has_value_edit = True
+                        elif prop == "cascading_delete":
+                            const.cascading_delete = True
+            constraints_list.append(const)
+
+        return constraints_list
+
     @staticmethod
     def get_fields(table):
         fields_list = list()
@@ -73,6 +162,8 @@ class XMLtoRAM:
                     tbl.means = av
 
             tbl.fields = self.get_fields(table)
+            tbl.indices = self.get_indices(table)
+            tbl.constraints = self.get_constraints(table)
             tables_list.append(tbl)
 
         return tables_list

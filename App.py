@@ -1,8 +1,8 @@
 import os
-import xml.dom.minidom as md
+import xml.dom.minidom as dom
 from XMLtoRAM import XMLtoRAM
 
-xml = md.parse(os.path.join("source_xml/", "xml-test.xml"))
+xml = dom.parse(os.path.join("source_xml/", "xml-test.xml"))
 schema = XMLtoRAM(xml).xml_to_ram()
 
 print("----------Schema----------")
@@ -18,6 +18,13 @@ for table in schema.tables:
         print("    %----", field.name, "----%")
         print("      rname= ", field.rname)
         print("      domain= ", field.domain)
+    for con in table.constraints:
+        print("    %----constraint----%")
+        print("      kind= ", con.kind)
+        print("      items= ", con.items)
+    for ind in table.indices:
+        print("    %----index----%")
+        print("      field= ", ind.field)
 
     print("  *---------------*")
 
