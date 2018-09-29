@@ -1,4 +1,4 @@
-import Classes
+import db_classes as dbc
 
 
 class XMLtoRAM:
@@ -12,7 +12,7 @@ class XMLtoRAM:
     def get_domains(self):
         domain_list = list()
         for domain in self.xml_repr.getElementsByTagName("domain"):
-            dom = Classes.Domain()
+            dom = dbc.Domain()
             for an, av in domain.attributes.items():
                 if an.lower() == "name":
                     dom.name = av
@@ -52,7 +52,7 @@ class XMLtoRAM:
     def get_indices(table):
         indices_list = list()
         for index in table.getElementsByTagName("index"):
-            idx = Classes.Index()
+            idx = dbc.Index()
             for an, av in index.attributes.items():
                 if an.lower() == "name":
                     idx.name = av
@@ -74,7 +74,7 @@ class XMLtoRAM:
     def get_constraints(table):
         constraints_list = list()
         for constraint in table.getElementsByTagName("constraint"):
-            const = Classes.Constraint()
+            const = dbc.Constraint()
             for an, av in constraint.attributes.items():
                 if an.lower() == "name":
                     const.name = av
@@ -103,7 +103,7 @@ class XMLtoRAM:
         fields_list = list()
         pos = 1
         for field in table.getElementsByTagName("field"):
-            fld = Classes.Field()
+            fld = dbc.Field()
             fld.position = str(pos)
             for an, av in field.attributes.items():
                 if an.lower() == "name":
@@ -138,7 +138,7 @@ class XMLtoRAM:
     def get_tables(self):
         tables_list = list()
         for table in self.xml_repr.getElementsByTagName("table"):
-            tbl = Classes.Table()
+            tbl = dbc.Table()
             for an, av in table.attributes.items():
                 if an.lower() == "name":
                     tbl.name = av
@@ -169,7 +169,7 @@ class XMLtoRAM:
         return tables_list
 
     def get_schema(self):
-        schema = Classes.Schema()
+        schema = dbc.Schema()
 
         for an, av in self.xml_repr.documentElement.attributes.items():
             if an.lower() == "version":

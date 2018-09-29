@@ -1,6 +1,6 @@
 import os
 import xml.dom.minidom as dom
-from XMLtoRAM import XMLtoRAM
+from xml_to_ram import XMLtoRAM
 
 xml = dom.parse(os.path.join("xml/", "xml-test.xml"))
 schema = XMLtoRAM(xml).xml_to_ram()
