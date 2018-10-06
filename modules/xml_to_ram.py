@@ -1,4 +1,4 @@
-import db_classes as dbc
+from db import db_classes as dbc
 
 
 class XMLtoRAM:
