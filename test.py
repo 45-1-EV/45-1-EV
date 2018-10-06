@@ -15,4 +15,4 @@ t = cursor.fetchall()
 for tt in t:
     print(tt)
 db.close()
-#   os.remove("test.db")
+os.remove("test.db")
