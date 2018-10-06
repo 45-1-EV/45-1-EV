@@ -181,4 +181,3 @@ class XMLtoRAM:
         schema.tables = self.tables_list
 
         return schema
-

@@ -7,9 +7,11 @@ class RAMToDBD:
         self.ram = ram
         self.connection = sqlite3.connect(db_name)
 
+    def insert_schema(self):
+        self.connection.cursor().execute("insert into dbd$schemas (name) values(?)", (self.ram.name,))
+
     def ram_to_dbd(self):
         self.connection.cursor().executescript(SQL_DBD_Init)
-        #code
+        self.insert_schema()
         self.connection.commit()
         self.connection.close()
-

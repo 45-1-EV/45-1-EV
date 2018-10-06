@@ -76,4 +76,3 @@ class Domain:
         self.length = None
         self.precision = None
         self.scale = None
-
