@@ -36,7 +36,7 @@ create table dbd$domains (
     thousands_separator boolean default(null),  -- нужен ли разделитель тысяч?
     summable boolean default(null),             -- признак того, что поле является суммируемым
     case_sensitive boolean default(null),       -- признак необходимости регистронезависимого поиска для поля
-    uuid varchar unique not null COLLATE NOCASE -- уникальный идентификатор домена
+    uuid varchar unique COLLATE NOCASE -- уникальный идентификатор домена
 );
 create index "idx.FZX832TFV" on dbd$domains(data_type_id);
 create index "idx.4AF9IY0XR" on dbd$domains(uuid);
@@ -56,7 +56,7 @@ create table dbd$tables (
     can_delete boolean default(null),     -- разрешено ли удаление в таблице
     temporal_mode varchar default(null),  -- временная таблица или нет? Если временная, то какого типа?
     means varchar default(null),          -- шаблон описания записи таблицы
-    uuid varchar unique not null COLLATE NOCASE  -- уникальный идентификатор таблицы
+    uuid varchar unique COLLATE NOCASE  -- уникальный идентификатор таблицы
 );
 create index "idx.GCOFIBEBJ" on dbd$tables(name);
 create index "idx.2J02T9LQ7" on dbd$tables(uuid);
@@ -81,7 +81,7 @@ create table dbd$fields (
     is_mean boolean default(null),         -- является ли поле элементом описания записи таблицы?
     autocalculated boolean default(null),  -- признак того, что значение в поле вычисляется программным кодом
     required boolean default(null),        -- признак того, что поле дорлжно быть заполнено
-    uuid varchar unique not null COLLATE NOCASE -- уникальный идентификатор поля
+    uuid varchar unique COLLATE NOCASE -- уникальный идентификатор поля
 );
 create index "idx.7UAKR6FT7" on dbd$fields(table_id);
 create index "idx.7HJ6KZXJF" on dbd$fields(position);
@@ -109,7 +109,7 @@ create table dbd$constraints (
     has_value_edit boolean default(null),   -- признак наличия поля ввода ключа
     cascading_delete boolean default(null), -- признак каскадного удаления для внешнего ключа
     expression varchar default(null),       -- выражение для контрольного ограничения
-    uuid varchar unique not null COLLATE NOCASE -- уникальный идентификатор ограничения
+    uuid varchar unique COLLATE NOCASE -- уникальный идентификатор ограничения
 );
 create index "idx.6F902GEQ3" on dbd$constraints(table_id);
 create index "idx.6SRYJ35AJ" on dbd$constraints(name);
@@ -138,7 +138,7 @@ create table dbd$indices (
     name varchar default(null),                         -- имя индекса
     local boolean default(0),                           -- показывает тип индекса: локальный или глобальный
     kind char default(null),                            -- вид индекса (простой/уникальный/полнотекстовый)
-    uuid varchar unique not null COLLATE NOCASE         -- уникальный идентификатор индекса
+    uuid varchar unique COLLATE NOCASE         -- уникальный идентификатор индекса
 );
 create index "idx.12XXTJUYZ" on dbd$indices(table_id);
 create index "idx.6G0KCWN0R" on dbd$indices(name);
