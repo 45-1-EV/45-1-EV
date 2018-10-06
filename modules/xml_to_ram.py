@@ -1,4 +1,4 @@
-import db_classes as dbc
+from db import db_classes as dbc
 
 
 class XMLtoRAM:
@@ -181,4 +181,3 @@ class XMLtoRAM:
         schema.tables = self.tables_list
 
         return schema
-
