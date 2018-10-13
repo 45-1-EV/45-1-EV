@@ -10,4 +10,5 @@ ram = XMLtoRAM(xml).xml_to_ram()
 RAMtoDBD(ram, "test.db").ram_to_dbd()
 ram2 = DBDtoRAM("test.db").schema()
 os.remove("test.db")
+
 print(ram2.name)
