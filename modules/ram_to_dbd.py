@@ -2,7 +2,7 @@ import sqlite3
 from db.dbd_const import SQL_DBD_Init
 
 
-class RAMToDBD:
+class RAMtoDBD:
     def __init__(self, ram, db_name):
         self.ram = ram
         self.connection = sqlite3.connect(db_name)
