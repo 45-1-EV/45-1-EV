@@ -18,6 +18,7 @@ class Table:
         self.ht_table_flags = None
         self.access_level = None
         self.means = None
+        self.schema = None
         self.fields = list()
         self.constraints = list()
         self.indices = list()
