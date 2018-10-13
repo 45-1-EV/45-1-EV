@@ -1,6 +1,5 @@
 import os
 import xml.dom.minidom as dom
-import sqlite3 as db
 from modules.xml_to_ram import XMLtoRAM
 from modules.ram_to_dbd import RAMtoDBD
 from modules.dbd_to_ram import DBDtoRAM
