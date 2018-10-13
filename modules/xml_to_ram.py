@@ -5,6 +5,7 @@ class XMLtoRAM:
     def __init__(self, xml_file):
         self.xml_repr = xml_file
         self.tables_list = self.get_tables()
+        self.domain_list = self.get_domains()
 
     def xml_to_ram(self):
         return self.get_schema()
@@ -178,6 +179,9 @@ class XMLtoRAM:
                 schema.name = av
             elif an.lower() == "description":
                 schema.description = av
+        schema.domains = self.domain_list
         schema.tables = self.tables_list
+        for table in schema.tables:
+            table.schema = schema.name
 
         return schema

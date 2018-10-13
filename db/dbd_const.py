@@ -73,7 +73,7 @@ create table dbd$fields (
     name varchar not null,                 -- латинское имя поля (будет использовано в схеме Oracle)
     russian_short_name varchar not null,   -- русское имя поля для отображения пользователю в интерактивных режимах
     description varchar default(null),     -- описание
-    domain_id integer not null,            -- идентификатор типа поля (dbd$domains)
+    domain_id integer default(null),       -- идентификатор типа поля (dbd$domains)
     can_input boolean default(null),       -- разрешено ли пользователю вводить значение в поле?
     can_edit boolean default(null),        -- разрешено ли пользователю изменять значение в поле?
     show_in_grid boolean default(null),    -- следует ли отображать значение поля в браузере таблицы?
