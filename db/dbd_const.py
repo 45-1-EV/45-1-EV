@@ -12,7 +12,10 @@ begin transaction;
 --
 create table dbd$schemas (
     id integer primary key autoincrement not null,
-    name varchar not null -- имя схемы
+    name varchar not null, -- имя схемы
+    description varchar,
+    version varchar,
+    fulltext_engine varchar
 );
 """
 

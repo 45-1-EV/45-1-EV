@@ -8,5 +8,8 @@ xml = dom.parse(os.path.join("xml/", "xml_test.xml"))
 ram = XMLtoRAM(xml).xml_to_ram()
 RAMtoDBD(ram, "test.db").ram_to_dbd()
 ram2 = DBDtoRAM("test.db").schema()
-os.remove("test.db")
-print(ram2.name)
+if os.path.exists("test.db"):
+    os.remove("test.db")
+
+for d in ram2.domains:
+    print(d.name)

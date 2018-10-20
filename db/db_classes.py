@@ -1,5 +1,6 @@
 class Schema:
     def __init__(self):
+        self.fulltext_engine = None
         self.version = None
         self.name = None
         self.description = None
@@ -50,6 +51,7 @@ class Constraint:
         self.expression = None
         self.has_value_edit = False
         self.cascading_delete = False
+        self.full_cascading_delete = False
 
 
 class Index:
