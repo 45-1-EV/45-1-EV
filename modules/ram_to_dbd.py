@@ -8,7 +8,10 @@ class RAMtoDBD:
         self.connection = sqlite3.connect(db_name)
 
     def schema(self):
-        self.connection.cursor().execute("insert into dbd$schemas (name) values(?)", (self.ram.name,))
+        self.connection.cursor().execute("insert into dbd$schemas \
+        (name, description, version, fulltext_engine) values(?,?,?,?)",
+                                         (self.ram.name, self.ram.description,
+                                          self.ram.version, self.ram.fulltext_engine))
 
     def tables(self):
         cursor = self.connection.cursor()
