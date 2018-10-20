@@ -11,5 +11,6 @@ ram2 = DBDtoRAM("test.db").schema()
 if os.path.exists("test.db"):
     os.remove("test.db")
 
-for d in ram2.domains:
-    print(d.name)
+for t in ram2.tables:
+    for f in t.fields:
+        print(f.name)

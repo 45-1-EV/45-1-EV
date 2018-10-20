@@ -17,7 +17,7 @@ class DBDtoRAM:
         for a in schema_attributes:
             schema.name, schema.description, schema.version, schema.fulltext_engine = a
         schema.domains = self.domains()
-#       schema.tables = self.tables()
+        schema.tables = self.tables()
         self.connection.commit()
         self.connection.close()
         return schema
@@ -85,3 +85,39 @@ class DBDtoRAM:
                 select name from dbd$tables where dbd$tables.id = ?""", (constraint.reference, )).fetchone()[0]
                 constraints_list.append(constraint)
             return constraints_list
+
+    def indices(self, table_id):
+        cursor = self.connection.cursor()
+        indices_list = list()
+        indices_attributes = cursor.execute("""select id, name, local, kind from dbd$indices\
+        where dbd$indices.table_id = ?""", (table_id, )).fetchall()
+        for a in indices_attributes:
+            index = dbc.Index()
+            if a[3] == "fulltext":
+                index.fulltext, index.uniqueness = True, False
+            elif a[3] == "uniqueness":
+                index.fulltext, index.uniqueness = False, True
+            else:
+                index.fulltext, index.uniqueness = False, False
+            index.name, index.local = a[1:-1]
+            index.field = cursor.execute("""select name from dbd$fields where dbd$fields.id = (\
+            select field_id from dbd$index_details\
+            where dbd$index_details.index_id = ?)""", (a[0], )).fetchone()[0]
+            indices_list.append(index)
+        return indices_list
+
+    def tables(self):
+        cursor = self.connection.cursor()
+        tables_list = list()
+        tables_attributes = cursor.execute("""\
+        select id, name, description, can_add, can_edit, can_delete, temporal_mode, means from dbd$tables""").fetchall()
+        for a in tables_attributes:
+            table = dbc.Table()
+            tid, table.name, table.description, table.add, table.edit, table.delete, table.temporal_mode, \
+                table.means = a
+            table.add, table.edit, table.delete = map(bool, [table.add, table.edit, table.delete])
+            table.fields = self.fields(tid)
+            table.constraints = self.constraints(tid)
+            table.indices = self.indices(tid)
+            tables_list.append(table)
+        return tables_list
