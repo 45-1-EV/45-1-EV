@@ -23,7 +23,7 @@ for t in ["tasks", "prjadm"]:
     xml = dom.parse(xml_file)
     ram = XMLtoRAM(xml).xml_to_ram()
     RAMtoDBD(ram, "test.db").ram_to_dbd()
-    ram2 = DBDtoRAM("test.db").schema()
+    ram2 = DBDtoRAM("test.db").dbd_to_ram()
     xml2 = RAMtoXML(ram2).ram_to_xml()
 
     with open("test.xml", "wb") as f:
