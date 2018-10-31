@@ -36,7 +36,7 @@ for t in ["tasks", "prjadm"]:
     file = codecs.open("diff_"+t+".html", 'w', 'utf-8')
     file.write(html)
     file.close()
-
+# make fake error file
 for table in ram2.tables:
     for field in table.fields:
         field.name = "error"
