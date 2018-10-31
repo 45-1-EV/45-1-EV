@@ -95,6 +95,8 @@ class XMLtoRAM:
                             const.has_value_edit = True
                         elif prop == "cascading_delete":
                             const.cascading_delete = True
+                        elif prop == "full_cascading_delete":
+                            const.full_cascading_delete = True
             constraints_list.append(const)
 
         return constraints_list
@@ -179,6 +181,8 @@ class XMLtoRAM:
                 schema.name = av
             elif an.lower() == "description":
                 schema.description = av
+            elif an.lower() == "fulltext_engine":
+                    schema.fulltext_engine = av
         schema.domains = self.domain_list
         schema.tables = self.tables_list
         for table in schema.tables:

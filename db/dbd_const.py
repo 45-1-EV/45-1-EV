@@ -12,7 +12,10 @@ begin transaction;
 --
 create table dbd$schemas (
     id integer primary key autoincrement not null,
-    name varchar not null -- имя схемы
+    name varchar not null, -- имя схемы
+    description varchar,
+    version varchar,
+    fulltext_engine varchar
 );
 """
 
@@ -55,6 +58,8 @@ create table dbd$tables (
     can_edit boolean default(null),       -- разрешено ли редактирование  таблице?
     can_delete boolean default(null),     -- разрешено ли удаление в таблице
     temporal_mode varchar default(null),  -- временная таблица или нет? Если временная, то какого типа?
+    ht_table_flags varchar default(null),
+    access_level varchar default(null),
     means varchar default(null),          -- шаблон описания записи таблицы
     uuid varchar unique COLLATE NOCASE  -- уникальный идентификатор таблицы
 );
@@ -108,6 +113,7 @@ create table dbd$constraints (
     unique_key_id integer default(null),    -- (опционально) идентификатор ограничения (dbd$constraints) таблицы, на которую ссылается внешний ключ (*1*)
     has_value_edit boolean default(null),   -- признак наличия поля ввода ключа
     cascading_delete boolean default(null), -- признак каскадного удаления для внешнего ключа
+    full_cascading_delete boolean default(null),
     expression varchar default(null),       -- выражение для контрольного ограничения
     uuid varchar unique COLLATE NOCASE -- уникальный идентификатор ограничения
 );
