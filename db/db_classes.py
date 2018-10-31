@@ -12,7 +12,7 @@ class Table:
     def __init__(self):
         self.name = None
         self.description = None
-        self.temporal_mode = False
+        self.temporal_mode = None
         self.add = False
         self.edit = False
         self.delete = False
