@@ -70,12 +70,13 @@ class DBDtoRAM:
             cursor = self.connection.cursor()
             constraints_list = list()
             constraints_attributes = cursor.execute("""select id, table_id, name, constraint_type, reference,\
-            unique_key_id, has_value_edit, cascading_delete, expression\
+            unique_key_id, has_value_edit, cascading_delete, full_cascading_delete, expression\
             from dbd$constraints where dbd$constraints.table_id = ?""", (table_id,)).fetchall()
             for a in constraints_attributes:
                 constraint = dbc.Constraint()
                 i, tbl, constraint.name, constraint.kind, constraint.reference, constraint.unique_key_id, \
-                    constraint.has_value_edit, constraint.cascading_delete, constraint.expression = a
+                    constraint.has_value_edit, constraint.cascading_delete,\
+                    constraint.full_cascading_delete,constraint.expression = a
                 constraint.has_value_edit, constraint.cascading_delete = map(bool, [constraint.has_value_edit,
                                                                                     constraint.cascading_delete])
                 constraint.items = cursor.execute("""select name from dbd$fields where dbd$fields.id = (\
@@ -110,11 +111,12 @@ class DBDtoRAM:
         cursor = self.connection.cursor()
         tables_list = list()
         tables_attributes = cursor.execute("""\
-        select id, name, description, can_add, can_edit, can_delete, temporal_mode, means from dbd$tables""").fetchall()
+        select id, name, description, can_add, can_edit, can_delete, temporal_mode,
+         ht_table_flags, access_level, means from dbd$tables""").fetchall()
         for a in tables_attributes:
             table = dbc.Table()
             tid, table.name, table.description, table.add, table.edit, table.delete, table.temporal_mode, \
-                table.means = a
+                table.ht_table_flags, table.access_level, table.means = a
             table.add, table.edit, table.delete = map(bool, [table.add, table.edit, table.delete])
             table.fields = self.fields(tid)
             table.constraints = self.constraints(tid)

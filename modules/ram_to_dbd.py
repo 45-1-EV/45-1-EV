@@ -18,12 +18,12 @@ class RAMtoDBD:
         cursor.executemany(
             """insert into dbd$tables (schema_id, name, description,
                                         can_add, can_edit, can_delete,
-                                        temporal_mode, means)
-                values (?, ?, ?, ?, ?, ?, ?, ?)""", list((cursor.execute(
+                                        temporal_mode, ht_table_flags, access_level, means)
+                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", list((cursor.execute(
                 """select id from dbd$schemas where dbd$schemas.name = ?""", (table.schema,)).fetchone()[0],
                     table.name, table.description,
                     table.add, table.edit, table.delete,
-                    table.temporal_mode, table.means
+                    table.temporal_mode, table.ht_table_flags, table.access_level, table.means
                 ) for table in self.ram.tables))
 
     def domains(self):
@@ -78,13 +78,14 @@ class RAMtoDBD:
                                          (table.name,)).fetchone()[0]
                     cursor.execute(
                         """insert into dbd$constraints (table_id, name, constraint_type, reference,
-                                                        unique_key_id, has_value_edit, cascading_delete, expression)
-                    values (?, ?, ?, ?, ?, ?, ?, ?)""", (
+                                                        unique_key_id, has_value_edit,
+                                                        cascading_delete, full_cascading_delete,expression)
+                    values (?, ?, ?, ?, ?, ?, ?, ?, ?)""", (
                             tid, constraint.name, constraint.kind,
                             None if constraint.reference is None else cursor.execute("""select id from dbd$tables
                              where dbd$tables.name = ?""", (constraint.reference, )).fetchone()[0],
                             constraint.unique_key_id, constraint.has_value_edit,
-                            constraint.cascading_delete, constraint.expression))
+                            constraint.cascading_delete, constraint.full_cascading_delete,constraint.expression))
 
     def indices(self):
         cursor = self.connection.cursor()
@@ -92,7 +93,7 @@ class RAMtoDBD:
             if table.indices:
                 for index in table.indices:
                     kind = None
-                    if not (index.fulltext ^ index.uniqueness):
+                    if index.fulltext or index.uniqueness:
                         if index.fulltext:
                             kind = "fulltext"
                         if index.uniqueness:
