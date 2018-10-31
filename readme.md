@@ -32,4 +32,6 @@
 
 **Директория xml**
 
-    ♦ xml-test.xml - тестовый xml файл.
+    ♦ tasks.xml - тестовый xml файл.
+    
+    ♦ prjadm.xml - тестовый xml файл.
