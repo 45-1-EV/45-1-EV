@@ -4,7 +4,7 @@ from db import db_classes as dbc
 
 ram = dbc.Schema()
 ram.name = "edo"
-ram.description = "desc"
+ram.description = "des"
 d = dbc.Domain()
 d.name = "dom"
 d.type = "numeric"
