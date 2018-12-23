@@ -39,15 +39,19 @@ class Field:
         self.autocalculated = False
         self.is_mean = False
         self.required = False
+        self.not_null = False
+        self.type = None
 
 
 class Constraint:
     def __init__(self):
         self.name = None
+        self.description = None
         self.kind = None
         self.items = None
         self.unique_key_id = None
         self.reference = None
+        self.ref_field = None
         self.expression = None
         self.has_value_edit = False
         self.cascading_delete = False
@@ -57,6 +61,7 @@ class Constraint:
 class Index:
     def __init__(self):
         self.name = None
+        self.description = None
         self.field = None
         self.fulltext = False
         self.uniqueness = False
@@ -71,6 +76,7 @@ class Domain:
         self.align = None
         self.width = None
         self.show_null = False
+        self.not_null = False
         self.summable = False
         self.case_sensitive = False
         self.show_lead_nulls = False
