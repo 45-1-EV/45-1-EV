@@ -187,5 +187,11 @@ class XMLtoRAM:
         schema.tables = self.tables_list
         for table in schema.tables:
             table.schema = schema.name
-
+            for constraint in table.constraints:
+                if constraint.kind == "FOREIGN":
+                    for t in schema.tables:
+                        if t.name == constraint.reference:
+                            for c in t.constraints:
+                                if c.kind == "PRIMARY":
+                                    constraint.ref_field = c.items
         return schema

@@ -40,6 +40,7 @@ class Field:
         self.is_mean = False
         self.required = False
         self.not_null = False
+        self.type = None
 
 
 class Constraint:
@@ -50,6 +51,7 @@ class Constraint:
         self.items = None
         self.unique_key_id = None
         self.reference = None
+        self.ref_field = None
         self.expression = None
         self.has_value_edit = False
         self.cascading_delete = False

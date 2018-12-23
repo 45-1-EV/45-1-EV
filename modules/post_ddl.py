@@ -1,105 +1,150 @@
-import psycopg2
-import psycopg2.sql as psql
-
-
 class PostDDL:
 
-    def __init__(self, ram, dbname, usr, pasw):
+    def __init__(self, ram, usr):
         self.ram_repr = ram
         self.usr = usr
-        self.conn = psycopg2.connect("dbname="+dbname+" user="+usr+" password="+pasw)
+        self.DDL = ""
 
     def filling_db(self):
+        self.DDL += "-- SCHEMA;\n"
         self.create_schema()
+        self.DDL += ";\n\n-- DOMAINS"
         self.create_domains()
+        self.DDL += ";\n\n-- TABLES"
         self.create_tables()
-        self.conn.commit()
-        self.conn.close()
+        self.DDL += ";\n\n-- FIELDS"
+        for table in self.ram_repr.tables:
+            self.create_fields(table)
+        self.DDL += ";\n\n-- INDICES"
+        for table in self.ram_repr.tables:
+            self.create_indices(table)
+        self.DDL += ";\n\n-- CONSTRAINTS"
+        for table in self.ram_repr.tables:
+            self.create_constraints(table)
+        self.DDL += ";\n\n-- CONSTRAINTS (FOREIGN)"
+        for table in self.ram_repr.tables:
+            self.create_constraints_foreign(table)
+        self.DDL += ";"
+        return self.DDL
+
+    @staticmethod
+    def check_type(t):
+        t = t.lower()
+        if t == "blob":
+            return "bytea"
+        if t == "string":
+            return "character varying"
+        if t == "largeint":
+            return "bigint"
+        if t == "word":
+            return "smallint"
+        if t == "memo":
+            return "character varying"
+        if t == "byte":
+            return "char"
+        if t == "code":
+            return "numeric"
+        return t
 
     def create_schema(self):
-        cur = self.conn.cursor()
-        req = "CREATE SCHEMA {} AUTHORIZATION "+self.usr
-        cur.execute(psql.SQL(req).format(psql.Identifier(self.ram_repr.name)))
+        req = 'CREATE SCHEMA "'+self.ram_repr.name+'" AUTHORIZATION '+self.usr
+        self.DDL += req
         if self.ram_repr.description:
-            req = "COMMENT ON SCHEMA {} IS '"+self.ram_repr.description+"'"
-            cur.execute(psql.SQL(req).format(psql.Identifier(self.ram_repr.name)))
-        cur.close()
+            req = 'COMMENT ON SCHEMA "'+self.ram_repr.name+'" IS '+"'"+self.ram_repr.description+"'"
+            self.DDL += ";\n" + req
 
     def create_domains(self):
-        cur = self.conn.cursor()
         for domain in self.ram_repr.domains:
-            req = "CREATE DOMAIN "+self.ram_repr.name+".{} AS "+domain.type
+            domain.type = self.check_type(domain.type)
+            req = 'CREATE DOMAIN "'+self.ram_repr.name+'"."'+domain.name+'" AS '+domain.type
             if domain.length:
-                req += " ("+str(domain.length)
+                req += "("+str(domain.length)
                 if domain.precision:
                     req += ","+str(domain.precision)
                 req += ")"
             if domain.not_null:
                 req += " NOT NULL"
-            cur.execute(psql.SQL(req).format(psql.Identifier(domain.name)))
+            self.DDL += ";\n" + req
             if domain.description:
-                req = "COMMENT ON DOMAIN "+self.ram_repr.name+".{} IS '"+domain.description+"'"
-                cur.execute(psql.SQL(req).format(psql.Identifier(domain.name)))
-        cur.close()
+                req = 'COMMENT ON DOMAIN "'+self.ram_repr.name+'"."'+domain.name+'" IS '+"'"+domain.description+"'"
+                self.DDL += ";\n" + req
 
     def create_tables(self):
-        cur = self.conn.cursor()
         for table in self.ram_repr.tables:
-            req = "CREATE TABLE "+self.ram_repr.name+".{} () WITH (OIDS = FALSE)"
-            cur.execute(psql.SQL(req).format(psql.Identifier(table.name)))
-            req = "ALTER TABLE "+self.ram_repr.name+".{} OWNER to "+self.usr
-            cur.execute(psql.SQL(req).format(psql.Identifier(table.name)))
+            req = 'CREATE TABLE "'+self.ram_repr.name+'"."'+table.name+'" () WITH (OIDS = FALSE)'
+            self.DDL += ";\n\n" + req
+            req = 'ALTER TABLE "'+self.ram_repr.name+'"."'+table.name+'" OWNER to '+self.usr
+            self.DDL += ";\n" + req
             if table.description:
-                req = "COMMENT ON TABLE "+self.ram_repr.name+".{} IS '"+table.description+"'"
-                cur.execute(psql.SQL(req).format(psql.Identifier(table.name)))
-            self.create_fields(table)
-            self.create_indices(table)
-            self.create_constraints(table)
-        cur.close()
+                req = 'COMMENT ON TABLE "'+self.ram_repr.name+'"."'+table.name+'" IS '+"'"+table.description+"'"
+                self.DDL += ";\n" + req
 
     def create_fields(self, table):
-        cur = self.conn.cursor()
         for field in table.fields:
-            req = "ALTER TABLE "+self.ram_repr.name+".{} ADD COLUMN {} "+self.ram_repr.name+"."+field.domain
+            req = 'ALTER TABLE "'+self.ram_repr.name+'"."'+table.name+'" ADD COLUMN "'\
+                  + field.name
+            if field.domain is not None:
+                req += '" "'+self.ram_repr.name+'"."'+field.domain+'"'
+            else:
+                req += " "+field.type
             if field.not_null:
                 req += " NOT NULL"
-            cur.execute(psql.SQL(req).format(psql.Identifier(table.name), psql.Identifier(field.name)))
+            self.DDL += ";\n\n" + req
             if field.description:
-                req = "COMMENT ON COLUMN "+self.ram_repr.name+".{}.{} IS '"+table.description+"'"
-                cur.execute(psql.SQL(req).format(psql.Identifier(table.name), psql.Identifier(field.name)))
-        cur.close()
+                req = 'COMMENT ON COLUMN "'+self.ram_repr.name+'"."'+table.name+'"."'\
+                      + field.name+'" IS '+"'"+field.description+"'"
+                self.DDL += ";\n" + req
 
     def create_indices(self, table):
-        cur = self.conn.cursor()
+        i = 1
         for index in table.indices:
+            if index.name is None:
+                index.name = table.name+"_index"+str(i)
             req = "CREATE "
             if index.uniqueness:
                 req += "UNIQUE "
-            req += "INDEX {} ON "+self.ram_repr.name+".{} USING btree ("\
-                   + index.field+" ASC NULLS LAST) TABLESPACE pg_default"
-            cur.execute(psql.SQL(req).format(psql.Identifier(index.name), psql.Identifier(table.name)))
+            req += 'INDEX "'+index.name+'" ON "'+self.ram_repr.name+'"."'+table.name+'" USING btree ("'\
+                   + index.field+'" ASC NULLS LAST) TABLESPACE pg_default'
+            self.DDL += ";\n\n" + req
             if index.description:
-                req = "COMMENT ON INDEX "+self.ram_repr.name+".{} IS '"+index.description+"'"
-                cur.execute(psql.SQL(req).format(psql.Identifier(index.name)))
-        cur.close()
+                req = 'COMMENT ON INDEX "'+self.ram_repr.name+'"."'+index.name+'" IS '+"'"+index.description+"'"
+                self.DDL += ";\n" + req
+            i += 1
 
     def create_constraints(self, table):
-        cur = self.conn.cursor()
+        i = 1
         for constraint in table.constraints:
-            if constraint.kind == "PRIMARY":
-                req = "ALTER TABLE " + self.ram_repr.name + ".{} ADD CONSTRAINT {} PRIMARY KEY ("\
-                      + constraint.items + ")"
-                cur.execute(psql.SQL(req).format(psql.Identifier(table.name), psql.Identifier(constraint.name)))
-            if constraint.kind == "UNIQUE":
-                req = "ALTER TABLE "+self.ram_repr.name+".{} ADD CONSTRAINT {} UNIQUE (" + constraint.items+")"
-                cur.execute(psql.SQL(req).format(psql.Identifier(table.name), psql.Identifier(constraint.name)))
+            if constraint.kind != "FOREIGN":
+                if constraint.name is None:
+                    constraint.name = table.name+"_constraint"+str(i)
+                if constraint.kind == "PRIMARY":
+                    req = 'ALTER TABLE "' + self.ram_repr.name + '"."'+table.name+'" ADD CONSTRAINT "'\
+                          + constraint.name+'" PRIMARY KEY ("' + constraint.items + '")'
+                    self.DDL += ";\n\n" + req
+                if constraint.kind == "UNIQUE":
+                    req = 'ALTER TABLE "'+self.ram_repr.name+'"."'+table.name+'" ADD CONSTRAINT "'\
+                          + constraint.name+'" UNIQUE ("' + constraint.items+'")'
+                    self.DDL += ";\n\n" + req
+                if constraint.description:
+                    req = 'COMMENT ON CONSTRAINT "'+constraint.name+'" ON "'+self.ram_repr.name\
+                          + '"."'+table.name+'" IS '+"'"+constraint.description+"'"
+                    self.DDL += ";\n" + req
+            i += 1
+
+    def create_constraints_foreign(self, table):
+        i = 1
+        for constraint in table.constraints:
             if constraint.kind == "FOREIGN":
-                req = "ALTER TABLE "+self.ram_repr.name+".{} ADD CONSTRAINT {} FOREIGN KEY (" + constraint.items+")"
-                req += " REFERENCES "+self.ram_repr.name+".{} ("+constraint.items+") MATCH SIMPLE"
-                req += " ON UPDATE CASCADE ON DELETE CASCADE"
-                cur.execute(psql.SQL(req).format(psql.Identifier(table.name), psql.Identifier(constraint.name),
-                                                 psql.Identifier(constraint.reference)))
-            if constraint.description:
-                req = "COMMENT ON CONSTRAINT {} ON "+self.ram_repr.name+".{} IS '"+constraint.description+"'"
-                cur.execute(psql.SQL(req).format(psql.Identifier(constraint.name), psql.Identifier(table.name)))
-        cur.close()
+                if constraint.name is None:
+                    constraint.name = table.name+"_constraint_f"+str(i)
+                    req = 'ALTER TABLE "'+self.ram_repr.name+'"."'+table.name+'" ADD CONSTRAINT "'\
+                          + constraint.name+'" FOREIGN KEY("' + constraint.items+'")'
+                    req += ' REFERENCES "'+self.ram_repr.name+'"."'\
+                           + constraint.reference + '" ("'+constraint.ref_field+'") MATCH SIMPLE'
+                    req += " ON UPDATE CASCADE ON DELETE CASCADE"
+                    self.DDL += ";\n\n" + req
+                if constraint.description:
+                    req = 'COMMENT ON CONSTRAINT "'+constraint.name+'" ON "'+self.ram_repr.name\
+                          + '"."'+table.name+'" IS '+"'"+constraint.description+"'"
+                    self.DDL += ";\n" + req
+            i += 1
