@@ -20,6 +20,5 @@ for t in ["tasks", "prjadm"]:
     cur.close()
     conn.commit()
     conn.close()
-
     f = open("post_ddl_"+t+".txt", "w")
     f.write(DDL)

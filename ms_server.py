@@ -1,12 +1,17 @@
-import pyodbc
-server = 'IDEA-PC\SQLEXPRESS'
-database = 'Test'
-user = 'sa'
-password = '123'
-driver = '{SQL Server}'
-con = pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+database+';UID='+user+';PWD=' + password)
-cursor = con.cursor()
-cursor.execute("select * from Table_1")
-row = cursor.fetchall()
-print(row)
-con.close()
+from modules.mssql_to_ram import MSSQLtoRAM
+from modules.post_ddl import PostDDL
+import psycopg2
+
+database = 'Northwind'
+schema = MSSQLtoRAM(database).create_schema()
+
+dbname = "Test"
+usr = "postgres"
+pasw = "123"
+conn = psycopg2.connect("dbname=" + dbname + " user=" + usr + " password=" + pasw)
+DDL = PostDDL(schema, usr).filling_db()
+cur = conn.cursor()
+cur.execute(DDL)
+cur.close()
+conn.commit()
+conn.close()
