@@ -41,6 +41,8 @@ class Field:
         self.required = False
         self.not_null = False
         self.type = None
+        self.length = None
+        self.precision = None
 
 
 class Constraint:

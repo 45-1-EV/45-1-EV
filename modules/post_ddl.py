@@ -44,6 +44,16 @@ class PostDDL:
             return "char"
         if t == "code":
             return "numeric"
+        if t == "nvarchar":
+            return "character varying"
+        if t == "datetime":
+            return "date"
+        if t == "image":
+            return "bytea[]"
+        if t == "ntext":
+            return "character varying"
+        if t == "money":
+            return "integer"
         return t
 
     def create_schema(self):
@@ -86,7 +96,8 @@ class PostDDL:
             if field.domain is not None:
                 req += '" "'+self.ram_repr.name+'"."'+field.domain+'"'
             else:
-                req += " "+field.type
+                field.type = self.check_type(field.type)
+                req += '" '+field.type
             if field.not_null:
                 req += " NOT NULL"
             self.DDL += ";\n\n" + req
@@ -98,8 +109,7 @@ class PostDDL:
     def create_indices(self, table):
         i = 1
         for index in table.indices:
-            if index.name is None:
-                index.name = table.name+"_index"+str(i)
+            index.name = table.name+"_index"+str(i)
             req = "CREATE "
             if index.uniqueness:
                 req += "UNIQUE "
@@ -115,8 +125,7 @@ class PostDDL:
         i = 1
         for constraint in table.constraints:
             if constraint.kind != "FOREIGN":
-                if constraint.name is None:
-                    constraint.name = table.name+"_constraint"+str(i)
+                constraint.name = table.name+"_constraint"+str(i)
                 if constraint.kind == "PRIMARY":
                     req = 'ALTER TABLE "' + self.ram_repr.name + '"."'+table.name+'" ADD CONSTRAINT "'\
                           + constraint.name+'" PRIMARY KEY ("' + constraint.items + '")'
@@ -125,24 +134,33 @@ class PostDDL:
                     req = 'ALTER TABLE "'+self.ram_repr.name+'"."'+table.name+'" ADD CONSTRAINT "'\
                           + constraint.name+'" UNIQUE ("' + constraint.items+'")'
                     self.DDL += ";\n\n" + req
+                if constraint.kind == "CHECK":
+                    s = str(constraint.expression)
+                    ls = list(s)
+                    for j in range(0, len(ls)):
+                        if ls[j] == '[' or ls[j] == ']':
+                            ls[j] = '"'
+                    s = ''.join(ls)
+                    req = 'ALTER TABLE "'+self.ram_repr.name+'"."'+table.name+'" ADD CONSTRAINT "'\
+                          + constraint.name+'" CHECK (' + s+')'
+                    self.DDL += ";\n\n" + req
                 if constraint.description:
                     req = 'COMMENT ON CONSTRAINT "'+constraint.name+'" ON "'+self.ram_repr.name\
                           + '"."'+table.name+'" IS '+"'"+constraint.description+"'"
                     self.DDL += ";\n" + req
-            i += 1
+                i += 1
 
     def create_constraints_foreign(self, table):
         i = 1
         for constraint in table.constraints:
             if constraint.kind == "FOREIGN":
-                if constraint.name is None:
-                    constraint.name = table.name+"_constraint_f"+str(i)
-                    req = 'ALTER TABLE "'+self.ram_repr.name+'"."'+table.name+'" ADD CONSTRAINT "'\
-                          + constraint.name+'" FOREIGN KEY("' + constraint.items+'")'
-                    req += ' REFERENCES "'+self.ram_repr.name+'"."'\
-                           + constraint.reference + '" ("'+constraint.ref_field+'") MATCH SIMPLE'
-                    req += " ON UPDATE CASCADE ON DELETE CASCADE"
-                    self.DDL += ";\n\n" + req
+                constraint.name = table.name+"_constraint_f"+str(i)
+                req = 'ALTER TABLE "'+self.ram_repr.name+'"."'+table.name+'" ADD CONSTRAINT "'\
+                      + constraint.name+'" FOREIGN KEY("' + constraint.items+'")'
+                req += ' REFERENCES "'+self.ram_repr.name+'"."'\
+                       + constraint.reference + '" ("'+constraint.ref_field+'") MATCH SIMPLE'
+                req += " ON UPDATE CASCADE ON DELETE CASCADE"
+                self.DDL += ";\n\n" + req
                 if constraint.description:
                     req = 'COMMENT ON CONSTRAINT "'+constraint.name+'" ON "'+self.ram_repr.name\
                           + '"."'+table.name+'" IS '+"'"+constraint.description+"'"
